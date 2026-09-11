@@ -69,6 +69,33 @@ public class Plan {
         );
     }
 
+    public static Plan reconstitute(
+            UUID id,
+            UUID gymId,
+            String name,
+            String description,
+            Integer durationDays,
+            BigDecimal price,
+            PlanStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
+    ) {
+
+        Plan plan = new Plan();
+
+        plan.id = id;
+        plan.gymId = gymId;
+        plan.name = name;
+        plan.description = description;
+        plan.durationDays = durationDays;
+        plan.price = price;
+        plan.status = status;
+        plan.createdAt = createdAt;
+        plan.updatedAt = updatedAt;
+
+        return plan;
+    }
+
     private void validateGymId(UUID gymId) {
         if (gymId == null) {
             throw new InvalidPlanDataException("Gym is required");

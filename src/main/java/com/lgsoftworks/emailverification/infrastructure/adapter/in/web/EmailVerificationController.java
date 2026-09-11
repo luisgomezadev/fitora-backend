@@ -8,11 +8,13 @@ import com.lgsoftworks.shared.application.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth/emailverification")
 @RequiredArgsConstructor
+@Validated
 public class EmailVerificationController {
 
     private final VerifyEmailUseCase verifyEmailUseCase;

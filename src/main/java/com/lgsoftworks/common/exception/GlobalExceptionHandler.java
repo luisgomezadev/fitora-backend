@@ -7,6 +7,8 @@ import com.lgsoftworks.auth.domain.exception.PasswordNotNullException;
 import com.lgsoftworks.emailverification.domain.exception.*;
 import com.lgsoftworks.gym.domain.exception.GymWithDocumentExistsException;
 import com.lgsoftworks.gym.domain.exception.GymWithEmailExistsException;
+import com.lgsoftworks.plan.domain.exception.PlanByIdNotFoundException;
+import com.lgsoftworks.plan.domain.exception.PlanWithNameExistsException;
 import com.lgsoftworks.shared.application.dto.response.ApiErrorResponse;
 import com.lgsoftworks.gym.domain.exception.InvalidGymDataException;
 import com.lgsoftworks.membership.domain.exception.InvalidMembershipDataException;
@@ -72,7 +74,8 @@ public class GlobalExceptionHandler {
             StudentByPhoneNotFoundException.class,
             StudentByIdNotFoundException.class,
             StudentByEmailNotFoundException.class,
-            StudentByDocumentNumberNotFoundException.class
+            StudentByDocumentNumberNotFoundException.class,
+            PlanByIdNotFoundException.class
     })
     public ApiErrorResponse handleNotFoundException(RuntimeException ex) {
         return ApiErrorResponse.builder()
@@ -92,7 +95,8 @@ public class GlobalExceptionHandler {
             GymWithEmailExistsException.class,
             StudentWithDocumentNumberExistsException.class,
             StudentWithEmailExistsException.class,
-            StudentWithPhoneExistsException.class
+            StudentWithPhoneExistsException.class,
+            PlanWithNameExistsException.class
     })
     public ApiErrorResponse handleConflict(RuntimeException ex) {
         return ApiErrorResponse.builder()

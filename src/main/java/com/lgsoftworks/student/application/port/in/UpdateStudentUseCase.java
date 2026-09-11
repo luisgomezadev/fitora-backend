@@ -8,4 +8,7 @@ import java.util.UUID;
 
 public interface UpdateStudentUseCase {
     ApiResponse<StudentResponse> update(UUID id, StudentUpdateRequest request);
+    ApiResponse<Void> deactivate(UUID studentId);
+    ApiResponse<Void> activate(UUID studentId);
+    ApiResponse<Void> suspend(UUID studentId);
 }

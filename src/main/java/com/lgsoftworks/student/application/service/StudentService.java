@@ -190,4 +190,50 @@ public class StudentService implements CreateStudentUseCase,
                 .data(studentResponse)
                 .build();
     }
+
+    @Override
+    public ApiResponse<Void> deactivate(UUID studentId) {
+        UUID gymId = currentUserService.getGymId();
+
+        Student student = studentRepositoryPort
+                .findByIdAndGymId(studentId, gymId)
+                .orElseThrow(() -> new StudentByIdNotFoundException(studentId));
+
+        student.deactivate();
+        studentRepositoryPort.save(student);
+        return ApiResponse.<Void>builder()
+                .message("Alumno desactivado correctamente")
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Void> activate(UUID studentId) {
+        UUID gymId = currentUserService.getGymId();
+
+        Student student = studentRepositoryPort
+                .findByIdAndGymId(studentId, gymId)
+                .orElseThrow(() -> new StudentByIdNotFoundException(studentId));
+
+        student.activate();
+        studentRepositoryPort.save(student);
+        return ApiResponse.<Void>builder()
+                .message("Alumno activado correctamente")
+                .build();
+    }
+
+    @Override
+    public ApiResponse<Void> suspend(UUID studentId) {
+        UUID gymId = currentUserService.getGymId();
+
+        Student student = studentRepositoryPort
+                .findByIdAndGymId(studentId, gymId)
+                .orElseThrow(() -> new StudentByIdNotFoundException(studentId));
+
+        student.suspend();
+        studentRepositoryPort.save(student);
+        return ApiResponse.<Void>builder()
+                .message("Alumno suspendido correctamente")
+                .build();
+    }
+
 }

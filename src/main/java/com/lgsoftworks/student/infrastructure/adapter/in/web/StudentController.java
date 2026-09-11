@@ -67,4 +67,19 @@ public class StudentController {
         return ResponseEntity.ok(getStudentUseCase.findByDocumentNumberAndGymId(documentNumber));
     }
 
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<ApiResponse<Void>> deactivateStudentById(@PathVariable UUID id) {
+        return ResponseEntity.ok(updateStudentUseCase.deactivate(id));
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<ApiResponse<Void>> activateStudentById(@PathVariable UUID id) {
+        return ResponseEntity.ok(updateStudentUseCase.activate(id));
+    }
+
+    @PatchMapping("/{id}/suspend")
+    public ResponseEntity<ApiResponse<Void>> suspendStudentById(@PathVariable UUID id) {
+        return ResponseEntity.ok(updateStudentUseCase.suspend(id));
+    }
+
 }
