@@ -5,6 +5,7 @@ import com.lgsoftworks.plan.infrastructure.adapter.out.persistence.entity.PlanEn
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,6 +14,8 @@ import java.util.UUID;
 public interface PlanRepository extends JpaRepository<PlanEntity, UUID> {
 
     Optional<PlanEntity> findByIdAndGymId(UUID id, UUID gymId);
+
+    List<PlanEntity> findAllByIdInAndGymId(Collection<UUID> ids, UUID gymId);
 
     List<PlanEntity> findByGymIdAndStatus(UUID gymId, PlanStatus status);
 

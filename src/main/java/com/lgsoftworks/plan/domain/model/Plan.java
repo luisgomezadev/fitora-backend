@@ -98,24 +98,24 @@ public class Plan {
 
     private void validateGymId(UUID gymId) {
         if (gymId == null) {
-            throw new InvalidPlanDataException("Gym is required");
+            throw new InvalidPlanDataException("El Gym es requerido");
         }
     }
 
     private void validateName(String name) {
         if (name == null || name.isBlank()) {
-            throw new InvalidPlanDataException("Plan name is required");
+            throw new InvalidPlanDataException("El nombre del plan es requerido");
         }
 
         if (name.trim().length() < 3) {
             throw new InvalidPlanDataException(
-                    "Plan name must have at least 3 characters"
+                    "El nombre del plan no puede ser menor a 3 caracteres"
             );
         }
 
         if (name.trim().length() > 100) {
             throw new InvalidPlanDataException(
-                    "Plan name cannot exceed 100 characters"
+                    "El nombre del plan no puede ser mayor a 100 caracteres"
             );
         }
     }
@@ -123,25 +123,25 @@ public class Plan {
     private void validateDuration(Integer durationDays) {
         if (durationDays == null) {
             throw new InvalidPlanDataException(
-                    "Plan duration is required"
+                    "La duración del plan es requerida"
             );
         }
 
         if (durationDays <= 0) {
             throw new InvalidPlanDataException(
-                    "Plan duration must be greater than zero"
+                    "La duración del plan no puede ser menor a 0"
             );
         }
     }
 
     private void validatePrice(BigDecimal price) {
         if (price == null) {
-            throw new InvalidPlanDataException("Plan price is required");
+            throw new InvalidPlanDataException("El precio del plan es requerido");
         }
 
         if (price.compareTo(BigDecimal.ZERO) < 0) {
             throw new InvalidPlanDataException(
-                    "Plan price cannot be negative"
+                    "El precio del plan no puede ser negativo"
             );
         }
     }

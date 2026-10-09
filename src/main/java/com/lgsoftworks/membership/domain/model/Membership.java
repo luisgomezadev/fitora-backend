@@ -18,7 +18,7 @@ public class Membership {
     private UUID id;
 
     private UUID gymId;
-    private UUID studentId;
+    private UUID customerId;
     private UUID planId;
 
     private LocalDate startDate;
@@ -38,29 +38,28 @@ public class Membership {
 
     private Membership(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
             UUID planId,
             LocalDate startDate,
             LocalDate endDate,
             BigDecimal price,
             PaymentMethod paymentMethod,
-            LocalDateTime paymentDate,
             UUID registeredBy
     ) {
-        validateIds(gymId, studentId, planId);
+        validateIds(gymId, customerId, planId);
         validateDates(startDate, endDate);
         validatePrice(price);
-        validatePayment(paymentMethod, paymentDate, registeredBy);
+        validatePayment(paymentMethod, registeredBy);
 
         this.id = UUID.randomUUID();
         this.gymId = gymId;
-        this.studentId = studentId;
+        this.customerId = customerId;
         this.planId = planId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
         this.paymentMethod = paymentMethod;
-        this.paymentDate = paymentDate;
+        this.paymentDate = LocalDateTime.now();
         this.registeredBy = registeredBy;
         this.status = MembershipStatus.ACTIVE;
         this.createdAt = LocalDateTime.now();
@@ -69,39 +68,71 @@ public class Membership {
 
     public static Membership create(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
+            UUID planId,
+            LocalDate startDate,
+            LocalDate endDate,
+            BigDecimal price,
+            PaymentMethod paymentMethod,
+            UUID registeredBy
+    ) {
+        return new Membership(
+                gymId,
+                customerId,
+                planId,
+                startDate,
+                endDate,
+                price,
+                paymentMethod,
+                registeredBy
+        );
+    }
+
+    public static Membership reconstitute(
+            UUID id,
+            UUID gymId,
+            UUID customerId,
             UUID planId,
             LocalDate startDate,
             LocalDate endDate,
             BigDecimal price,
             PaymentMethod paymentMethod,
             LocalDateTime paymentDate,
-            UUID registeredBy
+            UUID registeredBy,
+            MembershipStatus status,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {
-        return new Membership(
-                gymId,
-                studentId,
-                planId,
-                startDate,
-                endDate,
-                price,
-                paymentMethod,
-                paymentDate,
-                registeredBy
-        );
+        Membership membership = new Membership();
+
+        membership.id = id;
+        membership.gymId = gymId;
+        membership.customerId = customerId;
+        membership.planId = planId;
+        membership.startDate = startDate;
+        membership.endDate = endDate;
+        membership.price = price;
+        membership.paymentMethod = paymentMethod;
+        membership.paymentDate = paymentDate;
+        membership.registeredBy = registeredBy;
+        membership.status = status;
+        membership.createdAt = createdAt;
+        membership.updatedAt = updatedAt;
+
+        return membership;
     }
 
     private void validateIds(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
             UUID planId
     ) {
         if (gymId == null) {
             throw new InvalidMembershipDataException("Gym is required");
         }
 
-        if (studentId == null) {
-            throw new InvalidMembershipDataException("Student is required");
+        if (customerId == null) {
+            throw new InvalidMembershipDataException("Customer is required");
         }
 
         if (planId == null) {
@@ -148,18 +179,11 @@ public class Membership {
 
     private void validatePayment(
             PaymentMethod paymentMethod,
-            LocalDateTime paymentDate,
             UUID registeredBy
     ) {
         if (paymentMethod == null) {
             throw new InvalidMembershipDataException(
                     "Payment method is required"
-            );
-        }
-
-        if (paymentDate == null) {
-            throw new InvalidMembershipDataException(
-                    "Payment date is required"
             );
         }
 

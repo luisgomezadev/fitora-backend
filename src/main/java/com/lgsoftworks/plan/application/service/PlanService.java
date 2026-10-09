@@ -12,9 +12,9 @@ import com.lgsoftworks.plan.domain.model.Plan;
 import com.lgsoftworks.plan.domain.port.out.PlanRepositoryPort;
 import com.lgsoftworks.plan.domain.service.PlanUniquenessValidator;
 import com.lgsoftworks.shared.application.dto.response.ApiResponse;
-import com.lgsoftworks.student.domain.exception.StudentByIdNotFoundException;
-import com.lgsoftworks.student.domain.model.Student;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -60,7 +60,8 @@ public class PlanService implements CreatePlanUseCase,
 
         UUID gymId = currentUserService.getGymId();
 
-        List<PlanResponse> planResponses = planRepositoryPort.findByGymId(gymId)
+        List<PlanResponse> planResponses = planRepositoryPort
+                .findByGymId(gymId)
                 .stream()
                 .map(planModelMapper::toResponse)
                 .toList();
@@ -72,6 +73,23 @@ public class PlanService implements CreatePlanUseCase,
     }
 
     @Override
+    public ApiResponse<PlanResponse> findByIdAndGymId(UUID planId) {
+        UUID gymId = currentUserService.getGymId();
+
+        PlanResponse planResponse = planRepositoryPort
+                .findByIdAndGymId(planId, gymId)
+                .map(planModelMapper::toResponse)
+                .orElseThrow(PlanByIdNotFoundException::new);
+
+        return ApiResponse.<PlanResponse>builder()
+                .message("Plan obtenido correctamente")
+                .data(planResponse)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<PlanResponse> update(UUID planId, PlanRequest planRequest) {
 
         UUID gymId = currentUserService.getGymId();
@@ -98,6 +116,7 @@ public class PlanService implements CreatePlanUseCase,
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> deactivate(UUID planId) {
         UUID gymId = currentUserService.getGymId();
 
@@ -113,6 +132,7 @@ public class PlanService implements CreatePlanUseCase,
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     public ApiResponse<Void> activate(UUID planId) {
         UUID gymId = currentUserService.getGymId();
 

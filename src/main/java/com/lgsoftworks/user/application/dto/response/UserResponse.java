@@ -1,11 +1,9 @@
 package com.lgsoftworks.user.application.dto.response;
 
 import com.lgsoftworks.user.domain.enums.UserRole;
-import com.lgsoftworks.user.domain.enums.UserStatus;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter

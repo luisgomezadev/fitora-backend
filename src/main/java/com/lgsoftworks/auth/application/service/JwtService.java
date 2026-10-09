@@ -1,13 +1,10 @@
 package com.lgsoftworks.auth.application.service;
 
-import com.lgsoftworks.auth.infrastructure.config.JwtProperties;
+import com.lgsoftworks.auth.domain.exception.InvalidTokenException;
+import com.lgsoftworks.auth.domain.exception.TokenCouldNotRenewedException;
 import com.lgsoftworks.auth.domain.model.AuthenticatedUser;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.UnsupportedJwtException;
+import com.lgsoftworks.auth.infrastructure.config.JwtProperties;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -139,7 +136,7 @@ public class JwtService {
                 | IllegalArgumentException e
         ) {
 
-            throw new RuntimeException(
+            throw new InvalidTokenException(
                     "JWT token inválido o mal formado",
                     e
             );
@@ -183,8 +180,8 @@ public class JwtService {
 
         if (canTokenBeRenewed(token)) {
 
-            throw new IllegalArgumentException(
-                    "The JWT couldn't be renewed"
+            throw new TokenCouldNotRenewedException(
+                    "El token no puede ser renovado, ya que ha expirado o está fuera de la ventana de renovación"
             );
         }
 

@@ -14,7 +14,7 @@ public class Attendance {
     private UUID id;
 
     private UUID gymId;
-    private UUID studentId;
+    private UUID customerId;
     private UUID membershipId;
 
     private LocalDateTime checkIn;
@@ -24,14 +24,14 @@ public class Attendance {
 
     private Attendance(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
             UUID membershipId
     ) {
-        validateIds(gymId, studentId, membershipId);
+        validateIds(gymId, customerId, membershipId);
 
         this.id = UUID.randomUUID();
         this.gymId = gymId;
-        this.studentId = studentId;
+        this.customerId = customerId;
         this.membershipId = membershipId;
         this.checkIn = LocalDateTime.now();
         this.checkOut = null;
@@ -40,32 +40,32 @@ public class Attendance {
 
     public static Attendance checkIn(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
             UUID membershipId
     ) {
         return new Attendance(
                 gymId,
-                studentId,
+                customerId,
                 membershipId
         );
     }
 
     private void validateIds(
             UUID gymId,
-            UUID studentId,
+            UUID customerId,
             UUID membershipId
     ) {
         if (gymId == null) {
-            throw new InvalidAttendanceDataException("Gym is required");
+            throw new InvalidAttendanceDataException("El gimnasio es obligatorio");
         }
 
-        if (studentId == null) {
-            throw new InvalidAttendanceDataException("Student is required");
+        if (customerId == null) {
+            throw new InvalidAttendanceDataException("El cliente es obligatorio");
         }
 
         if (membershipId == null) {
             throw new InvalidAttendanceDataException(
-                    "Membership is required"
+                    "La membresía es obligatoria"
             );
         }
     }
@@ -74,7 +74,7 @@ public class Attendance {
 
         if (this.checkOut != null) {
             throw new InvalidAttendanceDataException(
-                    "Attendance is already closed"
+                    "La asistencia ya está cerrada"
             );
         }
 

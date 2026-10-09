@@ -9,6 +9,7 @@ import com.lgsoftworks.plan.infrastructure.adapter.out.persistence.repository.Pl
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +31,14 @@ public class PlanJpaAdapter implements PlanRepositoryPort {
     public Optional<Plan> findByIdAndGymId(UUID id, UUID gymId) {
         return planRepository.findByIdAndGymId(id, gymId)
                 .map(planDboMapper::toDomain);
+    }
+
+    @Override
+    public List<Plan> findAllByIdInAndGymId(Collection<UUID> ids, UUID gymId) {
+        return planRepository.findAllByIdInAndGymId(ids, gymId)
+                .stream()
+                .map(planDboMapper::toDomain)
+                .toList();
     }
 
     @Override

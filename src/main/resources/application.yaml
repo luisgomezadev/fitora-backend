@@ -36,3 +36,8 @@ jwt:
   secret-key: ${SECRET_KEY}
   expiration: 86400000
   refresh-window: 604800000
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method

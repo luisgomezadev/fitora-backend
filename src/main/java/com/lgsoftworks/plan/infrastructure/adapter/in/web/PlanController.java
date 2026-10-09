@@ -6,6 +6,8 @@ import com.lgsoftworks.plan.application.port.in.CreatePlanUseCase;
 import com.lgsoftworks.plan.application.port.in.GetPlanUseCase;
 import com.lgsoftworks.plan.application.port.in.UpdatePlanUseCase;
 import com.lgsoftworks.shared.application.dto.response.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,12 +22,14 @@ import java.util.UUID;
 @RequestMapping("/api/v1/plans")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Planes", description = "Operaciones relacionadas con los planes")
 public class PlanController {
 
     private final CreatePlanUseCase createPlanUseCase;
     private final GetPlanUseCase getPlanUseCase;
     private final UpdatePlanUseCase updatePlanUseCase;
 
+    @Operation(summary = "Crear un nuevo plan")
     @PostMapping
     public ResponseEntity<ApiResponse<PlanResponse>> createPlan(
             @Valid @RequestBody PlanRequest planRequest
@@ -34,6 +38,7 @@ public class PlanController {
                 .body(createPlanUseCase.execute(planRequest));
     }
 
+    @Operation(summary = "Actualizar plan existente")
     @PutMapping("/{planId}")
     public ResponseEntity<ApiResponse<PlanResponse>> updatePlan(
             @PathVariable UUID planId,
@@ -42,16 +47,19 @@ public class PlanController {
         return ResponseEntity.ok(updatePlanUseCase.update(planId, planRequest));
     }
 
+    @Operation(summary = "Obtener todos los planes registrados en el gimnasio")
     @GetMapping
     public ResponseEntity<ApiResponse<List<PlanResponse>>> getAll() {
         return ResponseEntity.ok(getPlanUseCase.findByGymId());
     }
 
+    @Operation(summary = "Desactivar plan por ID")
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<ApiResponse<Void>> deactivatePlanById(@PathVariable UUID id) {
         return ResponseEntity.ok(updatePlanUseCase.deactivate(id));
     }
 
+    @Operation(summary = "Activar plan por ID")
     @PatchMapping("/{id}/activate")
     public ResponseEntity<ApiResponse<Void>> activatePlanById(@PathVariable UUID id) {
         return ResponseEntity.ok(updatePlanUseCase.activate(id));

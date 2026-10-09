@@ -1,21 +1,23 @@
 package com.lgsoftworks.common.exception;
 
 import com.lgsoftworks.attendance.domain.exception.InvalidAttendanceDataException;
-import com.lgsoftworks.auth.domain.exception.AccessDeniedException;
-import com.lgsoftworks.auth.domain.exception.InvalidCredentialsException;
-import com.lgsoftworks.auth.domain.exception.PasswordNotNullException;
+import com.lgsoftworks.auth.domain.exception.*;
+import com.lgsoftworks.customer.domain.exception.*;
 import com.lgsoftworks.emailverification.domain.exception.*;
 import com.lgsoftworks.gym.domain.exception.GymWithDocumentExistsException;
 import com.lgsoftworks.gym.domain.exception.GymWithEmailExistsException;
+import com.lgsoftworks.gym.domain.exception.InvalidGymDataException;
+import com.lgsoftworks.membership.domain.exception.CustomerAlreadyHasActiveMembershipException;
+import com.lgsoftworks.membership.domain.exception.InvalidMembershipDataException;
+import com.lgsoftworks.membership.domain.exception.MembershipByIdNotFoundException;
+import com.lgsoftworks.plan.domain.exception.InvalidPlanDataException;
 import com.lgsoftworks.plan.domain.exception.PlanByIdNotFoundException;
+import com.lgsoftworks.plan.domain.exception.PlanNotActiveException;
 import com.lgsoftworks.plan.domain.exception.PlanWithNameExistsException;
 import com.lgsoftworks.shared.application.dto.response.ApiErrorResponse;
-import com.lgsoftworks.gym.domain.exception.InvalidGymDataException;
-import com.lgsoftworks.membership.domain.exception.InvalidMembershipDataException;
-import com.lgsoftworks.plan.domain.exception.InvalidPlanDataException;
 import com.lgsoftworks.shared.domain.exception.ForbiddenException;
-import com.lgsoftworks.student.domain.exception.*;
 import com.lgsoftworks.user.domain.exception.*;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -23,6 +25,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,7 +55,7 @@ public class GlobalExceptionHandler {
             InvalidGymDataException.class,
             InvalidMembershipDataException.class,
             InvalidPlanDataException.class,
-            InvalidStudentDataException.class,
+            InvalidCustomerDataException.class,
             VerificationCodeExpired.class,
             InvalidVerificationCode.class
     })
@@ -71,11 +74,12 @@ public class GlobalExceptionHandler {
             UserByIdNotFoundException.class,
             UserByUsernameNotFoundException.class,
             VerificationCodeNotFound.class,
-            StudentByPhoneNotFoundException.class,
-            StudentByIdNotFoundException.class,
-            StudentByEmailNotFoundException.class,
-            StudentByDocumentNumberNotFoundException.class,
-            PlanByIdNotFoundException.class
+            CustomerByPhoneNotFoundException.class,
+            CustomerByIdNotFoundException.class,
+            CustomerByEmailNotFoundException.class,
+            CustomerByDocumentNumberNotFoundException.class,
+            PlanByIdNotFoundException.class,
+            MembershipByIdNotFoundException.class
     })
     public ApiErrorResponse handleNotFoundException(RuntimeException ex) {
         return ApiErrorResponse.builder()
@@ -93,10 +97,12 @@ public class GlobalExceptionHandler {
             UserWithUsernameExistsException.class,
             GymWithDocumentExistsException.class,
             GymWithEmailExistsException.class,
-            StudentWithDocumentNumberExistsException.class,
-            StudentWithEmailExistsException.class,
-            StudentWithPhoneExistsException.class,
-            PlanWithNameExistsException.class
+            CustomerWithDocumentNumberExistsException.class,
+            CustomerWithEmailExistsException.class,
+            CustomerWithPhoneExistsException.class,
+            PlanWithNameExistsException.class,
+            PlanNotActiveException.class,
+            CustomerAlreadyHasActiveMembershipException.class
     })
     public ApiErrorResponse handleConflict(RuntimeException ex) {
         return ApiErrorResponse.builder()
@@ -120,7 +126,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({
             InvalidCredentialsException.class,
-            AuthorizationDeniedException.class
+            InvalidTokenException.class,
+            TokenCouldNotRenewedException.class
     })
     public ApiErrorResponse handleUnauthorized(RuntimeException ex) {
         return ApiErrorResponse.builder()
@@ -130,10 +137,24 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler({
+            JwtException.class,
+            AuthenticationException.class
+    })
+    public ApiErrorResponse handleInvalidToken(Exception ex) {
+        return ApiErrorResponse.builder()
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .message("Token inválido o expirado")
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
     // --- 403 FORBIDDEN ---
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler({
             AccessDeniedException.class,
+            AuthorizationDeniedException.class,
             ForbiddenException.class,
             EmailNotVerifiedException.class,
             UserCreationNotAllowedException.class
@@ -172,6 +193,16 @@ public class GlobalExceptionHandler {
                 .details(violations.stream()
                         .map(v -> v.getPropertyPath() + ": " + v.getMessage())
                         .collect(Collectors.toList()))
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ApiErrorResponse handleUnexpected(Exception ex) {
+        return ApiErrorResponse.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message("Error interno del servidor")
                 .timestamp(LocalDateTime.now())
                 .build();
     }

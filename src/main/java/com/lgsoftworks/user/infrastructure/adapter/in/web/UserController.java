@@ -4,7 +4,6 @@ import com.lgsoftworks.shared.application.dto.response.ApiResponse;
 import com.lgsoftworks.user.application.dto.request.CreateReceptionistRequest;
 import com.lgsoftworks.user.application.dto.response.UserResponse;
 import com.lgsoftworks.user.application.service.UserService;
-import com.lgsoftworks.user.domain.model.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
