@@ -3,6 +3,7 @@ package com.lgsoftworks.common.exception;
 import com.lgsoftworks.attendance.domain.exception.AttendanceByIdNotFoundException;
 import com.lgsoftworks.attendance.domain.exception.CustomerWithoutActiveMembershipException;
 import com.lgsoftworks.attendance.domain.exception.InvalidAttendanceDataException;
+import com.lgsoftworks.attendance.domain.exception.OpenAttendanceNotFoundException;
 import com.lgsoftworks.auth.domain.exception.*;
 import com.lgsoftworks.customer.domain.exception.*;
 import com.lgsoftworks.emailverification.domain.exception.*;
@@ -82,7 +83,8 @@ public class GlobalExceptionHandler {
             CustomerByDocumentNumberNotFoundException.class,
             PlanByIdNotFoundException.class,
             MembershipByIdNotFoundException.class,
-            AttendanceByIdNotFoundException.class
+            AttendanceByIdNotFoundException.class,
+            OpenAttendanceNotFoundException.class
     })
     public ApiErrorResponse handleNotFoundException(RuntimeException ex) {
         return ApiErrorResponse.builder()

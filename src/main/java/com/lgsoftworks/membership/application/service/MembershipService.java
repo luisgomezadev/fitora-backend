@@ -12,6 +12,7 @@ import com.lgsoftworks.membership.application.port.in.CreateMembershipUseCase;
 import com.lgsoftworks.membership.application.port.in.GetMembershipUseCase;
 import com.lgsoftworks.membership.domain.enums.MembershipStatus;
 import com.lgsoftworks.membership.domain.exception.CustomerIsNotActiveException;
+import com.lgsoftworks.membership.domain.exception.MembershipByIdNotFoundException;
 import com.lgsoftworks.membership.domain.model.Membership;
 import com.lgsoftworks.membership.domain.port.out.MembershipRepositoryPort;
 import com.lgsoftworks.membership.domain.service.MembershipValidator;
@@ -125,7 +126,7 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
 
         Membership membership = membershipRepositoryPort
                 .findByIdAndGymId(id, gymId)
-                .orElseThrow(() -> new RuntimeException("Afiliación no encontrada"));
+                .orElseThrow(MembershipByIdNotFoundException::new);
 
         return ApiResponse.<MembershipResponse>builder()
                 .message("Afiliación obtenida correctamente")
