@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,4 +21,13 @@ public interface MembershipRepository extends JpaRepository<MembershipEntity, UU
     Page<MembershipEntity> findByGymIdAndCustomerId(UUID gymId, UUID customerId, Pageable pageable);
 
     Page<MembershipEntity> findByGymIdAndStatus(UUID gymId, MembershipStatus status, Pageable pageable);
+
+    Optional<MembershipEntity>
+    findFirstByCustomerIdAndGymIdAndStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByEndDateDesc(
+            UUID customerId,
+            UUID gymId,
+            MembershipStatus status,
+            LocalDate startDate,
+            LocalDate endDate
+    );
 }

@@ -21,6 +21,8 @@ public interface MembershipDboMapper {
                 entity.getGymId(),
                 entity.getCustomerId(),
                 entity.getPlanId(),
+                entity.getCustomerName(),
+                entity.getPlanName(),
                 entity.getStartDate(),
                 entity.getEndDate(),
                 entity.getPrice(),

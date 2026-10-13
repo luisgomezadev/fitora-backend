@@ -10,7 +10,10 @@ import com.lgsoftworks.customer.application.port.in.UpdateCustomerUseCase;
 import com.lgsoftworks.shared.application.dto.response.ApiResponse;
 import com.lgsoftworks.shared.application.dto.response.PageResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -46,9 +49,9 @@ public class CustomerController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<CustomerResponse>>> getAll(
-            CustomerFilter filter,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @ParameterObject @ModelAttribute CustomerFilter filter,
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size
     ) {
         return ResponseEntity.ok(getCustomerUseCase.findByGymId(filter, page, size));
     }

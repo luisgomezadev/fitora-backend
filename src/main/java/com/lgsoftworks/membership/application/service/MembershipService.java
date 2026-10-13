@@ -1,6 +1,7 @@
 package com.lgsoftworks.membership.application.service;
 
 import com.lgsoftworks.auth.application.service.CurrentUserService;
+import com.lgsoftworks.customer.domain.enums.CustomerStatus;
 import com.lgsoftworks.customer.domain.exception.CustomerByIdNotFoundException;
 import com.lgsoftworks.customer.domain.model.Customer;
 import com.lgsoftworks.customer.domain.port.out.CustomerRepositoryPort;
@@ -10,6 +11,7 @@ import com.lgsoftworks.membership.application.dto.response.MembershipResponse;
 import com.lgsoftworks.membership.application.port.in.CreateMembershipUseCase;
 import com.lgsoftworks.membership.application.port.in.GetMembershipUseCase;
 import com.lgsoftworks.membership.domain.enums.MembershipStatus;
+import com.lgsoftworks.membership.domain.exception.CustomerIsNotActiveException;
 import com.lgsoftworks.membership.domain.model.Membership;
 import com.lgsoftworks.membership.domain.port.out.MembershipRepositoryPort;
 import com.lgsoftworks.membership.domain.service.MembershipValidator;
@@ -19,16 +21,14 @@ import com.lgsoftworks.plan.domain.port.out.PlanRepositoryPort;
 import com.lgsoftworks.shared.application.dto.response.ApiResponse;
 import com.lgsoftworks.shared.application.dto.response.PageResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +52,10 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
                 .findByIdAndGymId(customerId, gymId)
                 .orElseThrow(() -> new CustomerByIdNotFoundException(customerId));
 
+        if (!customer.getStatus().equals(CustomerStatus.ACTIVE)) {
+            throw new CustomerIsNotActiveException();
+        }
+
         Plan plan = planRepositoryPort
                 .findByIdAndGymId(planId, gymId)
                 .orElseThrow(PlanByIdNotFoundException::new);
@@ -64,6 +68,8 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
                 gymId,
                 customerId,
                 planId,
+                customer.getFullName(),
+                plan.getName(),
                 membershipRequest.getStartDate(),
                 endDate,
                 membershipRequest.getPrice(),
@@ -73,12 +79,9 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
 
         Membership savedMembership = membershipRepositoryPort.save(membership);
 
-        MembershipResponse membershipResponse =
-                membershipModelMapper.toResponse(savedMembership, customer, plan);
-
         return ApiResponse.<MembershipResponse>builder()
                 .message("Afiliación registrada con éxito para " + customer.getFullName())
-                .data(membershipResponse)
+                .data(membershipModelMapper.toResponse(savedMembership))
                 .build();
     }
 
@@ -96,7 +99,7 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
 
         return ApiResponse.<PageResponse<MembershipResponse>>builder()
                 .message("Afiliaciones del cliente " + customer.getFullName() + " obtenidas correctamente")
-                .data(toPageResponse(memberships, gymId))
+                .data(PageResponse.from(memberships.map(membershipModelMapper::toResponse)))
                 .build();
     }
 
@@ -111,7 +114,7 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
 
         return ApiResponse.<PageResponse<MembershipResponse>>builder()
                 .message("Afiliaciones en estado (" + membershipStatus.getLabel() + ") obtenidas correctamente")
-                .data(toPageResponse(memberships, gymId))
+                .data(PageResponse.from(memberships.map(membershipModelMapper::toResponse)))
                 .build();
     }
 
@@ -124,68 +127,13 @@ public class MembershipService implements CreateMembershipUseCase, GetMembership
                 .findByIdAndGymId(id, gymId)
                 .orElseThrow(() -> new RuntimeException("Afiliación no encontrada"));
 
-        Customer customer = customerRepositoryPort
-                .findByIdAndGymId(membership.getCustomerId(), gymId)
-                .orElseThrow(() -> new CustomerByIdNotFoundException(membership.getCustomerId()));
-
-        Plan plan = planRepositoryPort
-                .findByIdAndGymId(membership.getPlanId(), gymId)
-                .orElseThrow(PlanByIdNotFoundException::new);
-
-        MembershipResponse membershipResponse =
-                membershipModelMapper.toResponse(membership, customer, plan);
-
         return ApiResponse.<MembershipResponse>builder()
                 .message("Afiliación obtenida correctamente")
-                .data(membershipResponse)
+                .data(membershipModelMapper.toResponse(membership))
                 .build();
-
     }
 
     private Pageable buildPageable(int page, int size) {
         return PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-    }
-
-    private PageResponse<MembershipResponse> toPageResponse(Page<Membership> memberships, UUID gymId) {
-        List<MembershipResponse> responses = toResponses(memberships.getContent(), gymId);
-
-        return PageResponse.from(new PageImpl<>(
-                responses,
-                memberships.getPageable(),
-                memberships.getTotalElements()
-        ));
-    }
-
-    private List<MembershipResponse> toResponses(List<Membership> memberships, UUID gymId) {
-
-        if (memberships.isEmpty()) {
-            return List.of();
-        }
-
-        Set<UUID> customerIds = memberships.stream()
-                .map(Membership::getCustomerId)
-                .collect(Collectors.toSet());
-
-        Set<UUID> planIds = memberships.stream()
-                .map(Membership::getPlanId)
-                .collect(Collectors.toSet());
-
-        Map<UUID, Customer> customers = customerRepositoryPort
-                .findAllByIdInAndGymId(customerIds, gymId)
-                .stream()
-                .collect(Collectors.toMap(Customer::getId, Function.identity()));
-
-        Map<UUID, Plan> plans = planRepositoryPort
-                .findAllByIdInAndGymId(planIds, gymId)
-                .stream()
-                .collect(Collectors.toMap(Plan::getId, Function.identity()));
-
-        return memberships.stream()
-                .map(membership -> membershipModelMapper.toResponse(
-                        membership,
-                        customers.get(membership.getCustomerId()),
-                        plans.get(membership.getPlanId())
-                ))
-                .toList();
     }
 }

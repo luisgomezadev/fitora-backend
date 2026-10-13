@@ -35,8 +35,14 @@ public class MembershipEntity {
     @Column(name = "customer_id", nullable = false)
     private UUID customerId;
 
+    @Column(name = "customer_name", nullable = false)
+    private String customerName;
+
     @Column(name = "plan_id", nullable = false)
     private UUID planId;
+
+    @Column(name = "plan_name", nullable = false)
+    private String planName;
 
     @Column(name = "start_date", nullable = false)
     private LocalDate startDate;

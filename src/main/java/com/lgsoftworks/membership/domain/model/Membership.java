@@ -21,6 +21,9 @@ public class Membership {
     private UUID customerId;
     private UUID planId;
 
+    private String customerName;
+    private String planName;
+
     private LocalDate startDate;
     private LocalDate endDate;
 
@@ -40,6 +43,8 @@ public class Membership {
             UUID gymId,
             UUID customerId,
             UUID planId,
+            String customerName,
+            String planName,
             LocalDate startDate,
             LocalDate endDate,
             BigDecimal price,
@@ -47,6 +52,7 @@ public class Membership {
             UUID registeredBy
     ) {
         validateIds(gymId, customerId, planId);
+        validateNames(customerName, planName);
         validateDates(startDate, endDate);
         validatePrice(price);
         validatePayment(paymentMethod, registeredBy);
@@ -55,6 +61,8 @@ public class Membership {
         this.gymId = gymId;
         this.customerId = customerId;
         this.planId = planId;
+        this.customerName = customerName;
+        this.planName = planName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
@@ -70,6 +78,8 @@ public class Membership {
             UUID gymId,
             UUID customerId,
             UUID planId,
+            String customerName,
+            String planName,
             LocalDate startDate,
             LocalDate endDate,
             BigDecimal price,
@@ -80,6 +90,8 @@ public class Membership {
                 gymId,
                 customerId,
                 planId,
+                customerName,
+                planName,
                 startDate,
                 endDate,
                 price,
@@ -93,6 +105,8 @@ public class Membership {
             UUID gymId,
             UUID customerId,
             UUID planId,
+            String customerName,
+            String planName,
             LocalDate startDate,
             LocalDate endDate,
             BigDecimal price,
@@ -109,6 +123,8 @@ public class Membership {
         membership.gymId = gymId;
         membership.customerId = customerId;
         membership.planId = planId;
+        membership.customerName = customerName;
+        membership.planName = planName;
         membership.startDate = startDate;
         membership.endDate = endDate;
         membership.price = price;
@@ -137,6 +153,23 @@ public class Membership {
 
         if (planId == null) {
             throw new InvalidMembershipDataException("Plan is required");
+        }
+    }
+
+    private void validateNames(
+            String customerName,
+            String planName
+    ) {
+        if (customerName == null || customerName.isBlank()) {
+            throw new InvalidMembershipDataException(
+                    "Customer name is required"
+            );
+        }
+
+        if (planName == null || planName.isBlank()) {
+            throw new InvalidMembershipDataException(
+                    "Plan name is required"
+            );
         }
     }
 

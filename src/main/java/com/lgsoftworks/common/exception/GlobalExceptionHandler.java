@@ -1,5 +1,7 @@
 package com.lgsoftworks.common.exception;
 
+import com.lgsoftworks.attendance.domain.exception.AttendanceByIdNotFoundException;
+import com.lgsoftworks.attendance.domain.exception.CustomerWithoutActiveMembershipException;
 import com.lgsoftworks.attendance.domain.exception.InvalidAttendanceDataException;
 import com.lgsoftworks.auth.domain.exception.*;
 import com.lgsoftworks.customer.domain.exception.*;
@@ -7,9 +9,7 @@ import com.lgsoftworks.emailverification.domain.exception.*;
 import com.lgsoftworks.gym.domain.exception.GymWithDocumentExistsException;
 import com.lgsoftworks.gym.domain.exception.GymWithEmailExistsException;
 import com.lgsoftworks.gym.domain.exception.InvalidGymDataException;
-import com.lgsoftworks.membership.domain.exception.CustomerAlreadyHasActiveMembershipException;
-import com.lgsoftworks.membership.domain.exception.InvalidMembershipDataException;
-import com.lgsoftworks.membership.domain.exception.MembershipByIdNotFoundException;
+import com.lgsoftworks.membership.domain.exception.*;
 import com.lgsoftworks.plan.domain.exception.InvalidPlanDataException;
 import com.lgsoftworks.plan.domain.exception.PlanByIdNotFoundException;
 import com.lgsoftworks.plan.domain.exception.PlanNotActiveException;
@@ -57,7 +57,9 @@ public class GlobalExceptionHandler {
             InvalidPlanDataException.class,
             InvalidCustomerDataException.class,
             VerificationCodeExpired.class,
-            InvalidVerificationCode.class
+            InvalidVerificationCode.class,
+            CustomerIsNotActiveException.class,
+            CustomerWithoutActiveMembershipException.class
     })
     public ApiErrorResponse handleBadRequest(RuntimeException ex) {
         return ApiErrorResponse.builder()
@@ -79,7 +81,8 @@ public class GlobalExceptionHandler {
             CustomerByEmailNotFoundException.class,
             CustomerByDocumentNumberNotFoundException.class,
             PlanByIdNotFoundException.class,
-            MembershipByIdNotFoundException.class
+            MembershipByIdNotFoundException.class,
+            AttendanceByIdNotFoundException.class
     })
     public ApiErrorResponse handleNotFoundException(RuntimeException ex) {
         return ApiErrorResponse.builder()

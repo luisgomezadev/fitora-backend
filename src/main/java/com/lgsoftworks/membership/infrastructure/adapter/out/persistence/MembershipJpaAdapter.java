@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,6 +51,14 @@ public class MembershipJpaAdapter implements MembershipRepositoryPort {
     public Optional<Membership> findByIdAndGymId(UUID id, UUID gymId) {
         return membershipRepository
                 .findByIdAndGymId(id, gymId)
+                .map(membershipDboMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Membership> findActiveByCustomerIdAndGymId(UUID customerId, UUID gymId, LocalDate date) {
+        return membershipRepository
+                .findFirstByCustomerIdAndGymIdAndStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqualOrderByEndDateDesc(
+                        customerId, gymId, MembershipStatus.ACTIVE, date, date)
                 .map(membershipDboMapper::toDomain);
     }
 

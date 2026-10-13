@@ -13,7 +13,7 @@ import java.util.UUID;
 public record MembershipResponse(
         UUID id,
         UUID customerId,
-        String customerFullName,
+        String customerName,
         UUID planId,
         String planName,
         LocalDate startDate,

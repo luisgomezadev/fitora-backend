@@ -17,6 +17,8 @@ public class Attendance {
     private UUID customerId;
     private UUID membershipId;
 
+    private String customerName;
+
     private LocalDateTime checkIn;
     private LocalDateTime checkOut;
 
@@ -25,14 +27,17 @@ public class Attendance {
     private Attendance(
             UUID gymId,
             UUID customerId,
-            UUID membershipId
+            UUID membershipId,
+            String customerName
     ) {
         validateIds(gymId, customerId, membershipId);
+        validateName(customerName);
 
         this.id = UUID.randomUUID();
         this.gymId = gymId;
         this.customerId = customerId;
         this.membershipId = membershipId;
+        this.customerName = customerName;
         this.checkIn = LocalDateTime.now();
         this.checkOut = null;
         this.createdAt = LocalDateTime.now();
@@ -41,13 +46,39 @@ public class Attendance {
     public static Attendance checkIn(
             UUID gymId,
             UUID customerId,
-            UUID membershipId
+            UUID membershipId,
+            String customerName
     ) {
         return new Attendance(
                 gymId,
                 customerId,
-                membershipId
+                membershipId,
+                customerName
         );
+    }
+
+    public static Attendance reconstitute(
+            UUID id,
+            UUID gymId,
+            UUID customerId,
+            UUID membershipId,
+            String customerName,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut,
+            LocalDateTime createdAt
+    ) {
+        Attendance attendance = new Attendance();
+
+        attendance.id = id;
+        attendance.gymId = gymId;
+        attendance.customerId = customerId;
+        attendance.membershipId = membershipId;
+        attendance.customerName = customerName;
+        attendance.checkIn = checkIn;
+        attendance.checkOut = checkOut;
+        attendance.createdAt = createdAt;
+
+        return attendance;
     }
 
     private void validateIds(
@@ -70,15 +101,29 @@ public class Attendance {
         }
     }
 
+    private void validateName(String customerName) {
+        if (customerName == null || customerName.trim().isEmpty()) {
+            throw new InvalidAttendanceDataException("El nombre del cliente es obligatorio");
+        }
+    }
+
     public void checkOut() {
+        checkOut(LocalDateTime.now());
+    }
+
+    public void checkOut(LocalDateTime checkOutTime) {
 
         if (this.checkOut != null) {
+            throw new InvalidAttendanceDataException("La asistencia ya está cerrada");
+        }
+
+        if (checkOutTime.isBefore(this.checkIn)) {
             throw new InvalidAttendanceDataException(
-                    "La asistencia ya está cerrada"
+                    "La salida no puede ser anterior a la entrada"
             );
         }
 
-        this.checkOut = LocalDateTime.now();
+        this.checkOut = checkOutTime;
     }
 
     public boolean isOpen() {
